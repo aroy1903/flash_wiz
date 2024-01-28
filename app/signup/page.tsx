@@ -9,15 +9,16 @@ export default function signUpScreen() {
   const router = useRouter();
   const signUpFunction = (p: string, e: string, usr: string) => {
     let result = signUserUp(e, p, usr);
+    console.log(result);
     let user = null;
     let error = null;
     result.then((val) => {
       user = val.result;
       error = val.error;
+      if (user !== null) {
+        router.push("/content");
+      }
     });
-    if (user !== null) {
-      router.push("/content");
-    }
   };
 
   return (
@@ -28,23 +29,28 @@ export default function signUpScreen() {
           type="text"
           className=" mb-4"
           value={email}
-          onChange={(e) => setEmail(e.currentTarget.value)}
+          onChange={(e) => setEmail(e.target.value)}
         />
         <h4>password</h4>
         <input
           type="text"
           className=" mb-4"
           value={pass}
-          onChange={(e) => setPass(e.currentTarget.value)}
+          onChange={(e) => setPass(e.target.value)}
         />
         <h4>username</h4>
         <input
           type="text"
           className=" mb-4"
           value={usrName}
-          onChange={(e) => setUsrName(e.currentTarget.value)}
+          onChange={(e) => setUsrName(e.target.value)}
         />
-        <button className=" bg-green-700 text-white">Sign Up</button>
+        <button
+          className=" bg-green-700 text-white"
+          onClick={() => signUpFunction(pass, email, usrName)}
+        >
+          Sign Up
+        </button>
       </div>
     </div>
   );

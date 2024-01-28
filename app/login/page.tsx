@@ -6,17 +6,17 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const router = useRouter();
-  const signUpFunction = (p: string, e: string, usr: string) => {
+  const signInFunction = (p: string, e: string) => {
     let result = signUserIn(e, p);
     let user = null;
     let error = null;
     result.then((val) => {
       user = val.result;
       error = val.error;
+      if (user !== null) {
+        router.push("/content");
+      }
     });
-    if (user !== null) {
-      router.push("/content");
-    }
   };
 
   return (
@@ -27,16 +27,21 @@ export default function LoginPage() {
           type="text"
           className=" mb-4"
           value={email}
-          onChange={(e) => setEmail(e.currentTarget.value)}
+          onChange={(e) => setEmail(e.target.value)}
         />
         <h4>password</h4>
         <input
           type="text"
           className=" mb-4"
           value={pass}
-          onChange={(e) => setPass(e.currentTarget.value)}
+          onChange={(e) => setPass(e.target.value)}
         />
-        <button className=" bg-green-700 text-white">Login</button>
+        <button
+          className=" bg-green-700 text-white"
+          onClick={() => signInFunction(email, pass)}
+        >
+          Login
+        </button>
       </div>
     </div>
   );

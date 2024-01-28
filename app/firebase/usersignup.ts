@@ -43,7 +43,7 @@ const signUserIn = async (email: string, password: string) => {
   return { result, error };
 };
 
-const signUserOut = async (email: string, password: string) => {
+const signUserOut = async () => {
   let result = null;
   let error = null;
 

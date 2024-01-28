@@ -2,7 +2,7 @@
 import { AuthContext } from "../context/AuthContext";
 import { useContext } from "react";
 import { useRouter } from "next/navigation";
-
+import { signUserOut } from "../firebase/usersignup";
 export default function Header() {
   const router = useRouter();
 
@@ -13,7 +13,7 @@ export default function Header() {
       <h2 className="p-10 flex items-center">Flash Wiz</h2>
       <div className="p-10 flex flex-row w-[30%] items-center justify-center">
         {ob.user !== null ? (
-          <h3>Logout</h3>
+          <h3 onClick={() => signUserOut()}>Logout</h3>
         ) : (
           <div className=" w-[25%] flex justify-between">
             <button onClick={() => router.push("/login")}>login</button>

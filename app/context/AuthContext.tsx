@@ -7,8 +7,6 @@ import {
   useEffect,
 } from "react";
 
-
-
 export type activeUser = {
   user: User | null;
 };
@@ -19,7 +17,7 @@ import firebase_app from "../firebase/config";
 
 const auth = getAuth(firebase_app);
 
-export const AuthContext = createContext<activeUser>({user:null});
+export const AuthContext = createContext<activeUser>({ user: null });
 
 export const useAuthContext = () => useContext(AuthContext);
 
@@ -38,7 +36,7 @@ export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
       setLoading(false);
     });
 
-    unsubscribe();
+    () => unsubscribe();
   });
 
   return (
