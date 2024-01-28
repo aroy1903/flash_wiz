@@ -1,14 +1,13 @@
 "use client";
 import { useState } from "react";
-import { signUserUp } from "../firebase/usersignup";
+import { signUserIn } from "../firebase/usersignup";
 import { useRouter } from "next/navigation";
-export default function signUpScreen() {
+export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
-  const [usrName, setUsrName] = useState("");
   const router = useRouter();
   const signUpFunction = (p: string, e: string, usr: string) => {
-    let result = signUserUp(e, p, usr);
+    let result = signUserIn(e, p);
     let user = null;
     let error = null;
     result.then((val) => {
@@ -37,14 +36,7 @@ export default function signUpScreen() {
           value={pass}
           onChange={(e) => setPass(e.currentTarget.value)}
         />
-        <h4>username</h4>
-        <input
-          type="text"
-          className=" mb-4"
-          value={usrName}
-          onChange={(e) => setUsrName(e.currentTarget.value)}
-        />
-        <button className=" bg-green-700 text-white">Sign Up</button>
+        <button className=" bg-green-700 text-white">Login</button>
       </div>
     </div>
   );

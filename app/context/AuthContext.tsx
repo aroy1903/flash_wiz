@@ -7,9 +7,11 @@ import {
   useEffect,
 } from "react";
 
-export interface activeUser {
-  user: string;
-}
+
+
+export type activeUser = {
+  user: User | null;
+};
 
 import { onAuthStateChanged, getAuth, User } from "firebase/auth";
 
@@ -17,7 +19,7 @@ import firebase_app from "../firebase/config";
 
 const auth = getAuth(firebase_app);
 
-export const AuthContext = createContext({});
+export const AuthContext = createContext<activeUser>({user:null});
 
 export const useAuthContext = () => useContext(AuthContext);
 
