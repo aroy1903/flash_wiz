@@ -10,8 +10,6 @@
 /coverage
 
 
-#firebase config
-app/firebase_config/
 
 # next.js
 /.next/
