@@ -11,7 +11,7 @@
 
 
 #firebase config
-app/firebase
+firebase
 
 # next.js
 /.next/
