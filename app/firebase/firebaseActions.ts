@@ -1,4 +1,5 @@
 "use client";
+
 import {
   createUserWithEmailAndPassword,
   getAuth,
@@ -10,11 +11,11 @@ import firebase_app from "./config";
 
 const auth = getAuth(firebase_app);
 
-const signUserUp = async (
+export default async function signUserUp(
   email: string,
   password: string,
   username: string
-) => {
+) {
   let result = null;
   let error = null;
 
@@ -28,7 +29,7 @@ const signUserUp = async (
   }
 
   return { result, error };
-};
+}
 
 const signUserIn = async (email: string, password: string) => {
   let result = null;
@@ -56,4 +57,4 @@ const signUserOut = async () => {
   return { result, error };
 };
 
-export { signUserIn, signUserOut, signUserUp };
+export { signUserIn, signUserOut };

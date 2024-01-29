@@ -1,23 +1,57 @@
 "use client";
 import { AuthContext } from "../context/AuthContext";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { signUserOut } from "../firebase/usersignup";
+import { signUserOut } from "../firebase/firebaseActions";
+
 export default function Header() {
   const router = useRouter();
 
   const ob = useContext(AuthContext);
 
   return (
-    <div className=" h-[12vh] w-full bg-red-900 flex flex-row justify-around">
-      <h2 className="p-10 flex items-center">Flash Wiz</h2>
-      <div className="p-10 flex flex-row w-[30%] items-center justify-center">
+    <div className=" h-[12vh] w-full  bg-black flex flex-row justify-around text-white">
+      <h2
+        className="p-10 flex items-center  text-[30px] hover:cursor-pointer"
+        onClick={() => router.push("/")}
+      >
+        FlashWiz
+      </h2>
+      <div className="p-10 flex flex-row w-[30%] items-center justify-between">
         {ob.user !== null ? (
-          <h3 onClick={() => signUserOut()}>Logout</h3>
+          <div className=" flex  justify-between w-[45%]">
+            <h3
+              onClick={() => {
+                signUserOut();
+                router.push("/");
+              }}
+              className=" hover:cursor-pointer hover:underline"
+            >
+              logout
+            </h3>
+            <h3
+              onClick={() => {
+                router.push("/mydecks");
+              }}
+              className=" hover:cursor-pointer hover:underline"
+            >
+              my decks
+            </h3>
+          </div>
         ) : (
-          <div className=" w-[25%] flex justify-between">
-            <button onClick={() => router.push("/login")}>login</button>
-            <button onClick={() => router.push("/signup")}>sign up</button>
+          <div className=" w-[25%] flex justify-between text-[17px]">
+            <button
+              onClick={() => router.push("/login")}
+              className=" hover:underline"
+            >
+              login
+            </button>
+            <button
+              onClick={() => router.push("/signup")}
+              className=" hover:underline"
+            >
+              sign up
+            </button>
           </div>
         )}
       </div>

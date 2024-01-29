@@ -1,57 +1,50 @@
 "use client";
-import { useState } from "react";
-import { signUserUp } from "../firebase/usersignup";
+
+import { useEffect, useContext } from "react";
+import { signUp } from "../actions/clientActions";
+import { AuthContext } from "../context/AuthContext";
 import { useRouter } from "next/navigation";
-export default function signUpScreen() {
-  const [email, setEmail] = useState("");
-  const [pass, setPass] = useState("");
-  const [usrName, setUsrName] = useState("");
+export default function SignUpForm() {
+  const { user } = useContext(AuthContext);
   const router = useRouter();
-  const signUpFunction = (p: string, e: string, usr: string) => {
-    let result = signUserUp(e, p, usr);
-    console.log(result);
-    let user = null;
-    let error = null;
-    result.then((val) => {
-      user = val.result;
-      error = val.error;
-      if (user !== null) {
-        router.push("/content");
-      }
-    });
-  };
+
+  useEffect(() => {
+    if (user) {
+      router.push("/content");
+    }
+  }, [user]);
 
   return (
-    <div className=" grow bg-sky-700 flex items-center justify-center">
-      <div className=" flex flex-col">
-        <h4>email</h4>
-        <input
-          type="text"
-          className=" mb-4"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <h4>password</h4>
-        <input
-          type="text"
-          className=" mb-4"
-          value={pass}
-          onChange={(e) => setPass(e.target.value)}
-        />
-        <h4>username</h4>
-        <input
-          type="text"
-          className=" mb-4"
-          value={usrName}
-          onChange={(e) => setUsrName(e.target.value)}
-        />
-        <button
-          className=" bg-green-700 text-white"
-          onClick={() => signUpFunction(pass, email, usrName)}
-        >
-          Sign Up
-        </button>
-      </div>
+    <div className=" h-[88vh] flex items-center justify-center text-white">
+      <form
+        action={signUp}
+        className=" h-[45%] w-[25%] shadow-xl rounded-lg flex items-center justify-center bg-black"
+      >
+        <div className=" flex flex-col">
+          <label>email:</label>
+          <input
+            name="email"
+            type="email"
+            autoComplete="email"
+            className=" text-black text-[15px]"
+          />
+          <label>pasword:</label>
+          <input
+            name="pass"
+            type="password"
+            className=" text-black text-[15px]"
+          />
+          <label>username:</label>
+          <input
+            name="username"
+            type="text"
+            className=" text-black text-[15px]"
+          />
+          <button className=" px-2 py-1 mt-4 font-bold text-black bg-white rounded">
+            Submit
+          </button>
+        </div>
+      </form>
     </div>
   );
 }
