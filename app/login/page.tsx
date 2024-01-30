@@ -2,16 +2,14 @@
 import { useRouter } from "next/navigation";
 import { loginUser } from "../actions/clientActions";
 import { AuthContext } from "../context/AuthContext";
-import { useEffect, useContext } from "react";
+import { useEffect, useContext, useState } from "react";
 
 export default function LoginForm() {
   const { user } = useContext(AuthContext);
   const router = useRouter();
-
+  const [buttonDisable, setButtonDisable] = useState(false);
   useEffect(() => {
-    console.log(user);
     if (user) {
-      console.log("hello");
       router.push("/content");
     }
   }, [user]);
@@ -36,7 +34,10 @@ export default function LoginForm() {
             type="password"
             className=" text-black text-[15px]"
           />
-          <button className=" px-2 py-1 mt-4 font-bold text-black bg-white rounded">
+          <button
+            className=" px-2 py-1 mt-4 font-bold text-black bg-white rounded"
+            disabled={buttonDisable}
+          >
             Submit
           </button>
         </div>

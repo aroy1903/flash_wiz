@@ -39,7 +39,7 @@ export default function Header() {
             </h3>
           </div>
         ) : (
-          <div className=" w-[25%] flex justify-between text-[17px]">
+          <div className=" w-[50%] flex justify-around text-[17px]">
             <button
               onClick={() => router.push("/login")}
               className=" hover:underline"
