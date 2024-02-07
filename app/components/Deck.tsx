@@ -10,7 +10,7 @@ export default async function Deck() {
         src={naruto}
         alt="Naruto"
         className=" w-[300px] h[300px] rounded-lg"
-        priority
+        priority={true}
       ></Image>
 
       <form action={clickOnDeck} className=" w-[300px] text-center">

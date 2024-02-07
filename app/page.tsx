@@ -16,6 +16,7 @@ export default function Home() {
           src={FlashWizBG}
           alt="Picture of the author"
           className=" w-full h-[100%]"
+          priority={true}
         ></Image>
       </div>
     </div>
