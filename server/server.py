@@ -1,11 +1,9 @@
-from email import message
 from dotenv import load_dotenv
 import mysql.connector
 import os
 from flask import Flask, g, redirect, jsonify, request
 from mysql.connector import Error
-from networkx import is_connected
-
+from functools import wraps
 
 load_dotenv()
 
@@ -32,13 +30,38 @@ def get_db():
         return jsonify({"error": "database connection failed"}), 500
 
 
+def check_key(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        user_key = request.get_json()
+        request_uid = user_key['uid']
+        cursor = g.db.cursor()
+        query = "SELECT * FROM Users WHERE username = %s"
+        value = (user_key['username'],)
+        cursor.execute(query, value)
+        username, uid = cursor.fetchone()
+        if (uid != request_uid):
+            return "Invalid Key"
+        print(uid)
+        cursor.close()
+        result = f(*args, **kwargs)
+        return result
+    return wrapper
+
+
+@app.route("/test", methods=["POST"])
+@check_key
+def say_hi():
+    return "Hello"
+
+
 @app.route("/newuser", methods=["POST"])
 def hello_world():
     if request.is_json:
         data = request.get_json()
         cursor = g.db.cursor()
         query = "INSERT INTO Users (username, uid) VALUES (%s, %s)"
-        values = (data['username'], int(data['uid']))
+        values = (data['username'], data['uid'])
         cursor.execute(query, values)
         g.db.commit()
         cursor.close()
@@ -48,6 +71,7 @@ def hello_world():
 
 
 @app.route("/allusers")
+@check_key
 def return_users():
     cursor = g.db.cursor()
     cursor.execute("SELECT * from Users")
@@ -64,4 +88,4 @@ def teardown_request_function(error=None):
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)

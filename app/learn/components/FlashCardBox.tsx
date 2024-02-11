@@ -29,7 +29,15 @@ function FlashCardBox({ cards }: { cards: QndA[] }) {
           </div>
         </div>
       </div>
-      <button className=" w-[10%]" onClick={() => incCardNumber()}>
+      <button
+        className=" w-[10%]"
+        onClick={() => {
+          if (isFlipped) {
+            setIsFlipped(!isFlipped);
+          }
+          incCardNumber();
+        }}
+      >
         {">"}
       </button>
     </div>
