@@ -19,7 +19,7 @@ export default function Header() {
       </h2>
       <div className="p-10 flex flex-row w-[30%] items-center justify-between">
         {ob.user !== null ? (
-          <div className=" flex  justify-between w-[45%]">
+          <div className=" flex  justify-between w-[70%]">
             <h3
               onClick={() => {
                 signUserOut();
@@ -36,6 +36,22 @@ export default function Header() {
               className=" hover:cursor-pointer hover:underline"
             >
               my decks
+            </h3>
+            <h3
+              onClick={() => {
+                router.push("/create");
+              }}
+              className=" hover:cursor-pointer hover:underline"
+            >
+              create deck
+            </h3>
+            <h3
+              onClick={() => {
+                router.push("/content");
+              }}
+              className=" hover:cursor-pointer hover:underline"
+            >
+              all decks
             </h3>
           </div>
         ) : (

@@ -19,11 +19,23 @@ export async function signUp(formData: FormData) {
     await signUserUp(frmData.email, frmData.pass, frmData.usrname).then((r) => {
       result = r.result;
       error = r.error;
+
       if (result !== null) {
+        fetch("http://127.0.0.1:5000/newuser", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: result.user.displayName,
+            uid: result.user.uid,
+          }),
+        }).catch((e: Error) => console.log(e.message));
         redirect("/content");
       }
     });
   }
+
   return error;
 }
 

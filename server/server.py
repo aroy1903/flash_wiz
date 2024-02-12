@@ -42,7 +42,6 @@ def check_key(f):
         username, uid = cursor.fetchone()
         if (uid != request_uid):
             return "Invalid Key"
-        print(uid)
         cursor.close()
         result = f(*args, **kwargs)
         return result
@@ -56,7 +55,7 @@ def say_hi():
 
 
 @app.route("/newuser", methods=["POST"])
-def hello_world():
+def create_user():
     if request.is_json:
         data = request.get_json()
         cursor = g.db.cursor()
@@ -70,14 +69,58 @@ def hello_world():
         return jsonify({"error": "Request must be JSON"}), 400
 
 
-@app.route("/allusers")
+@app.route("/addcard", methods=["POST"])
 @check_key
-def return_users():
+def add_card():
+    if request.is_json:
+        data = request.get_json()
+        cursor = g.db.cursor()
+        query = "INSERT INTO FlashCards (username, question, answer, deck) VALUES (%s, %s, %s, %s)"
+        values = (data['username'], data['question'],
+                  data['answer'], data['deck'])
+        cursor.execute(query, values)
+        g.db.commit()
+        cursor.close()
+        return jsonify({"card": "added"}), 200
+    else:
+        return jsonify({"error": "Request must be JSON"}), 400
+
+
+@app.route("/alldecks")
+@check_key
+def return_decks():
     cursor = g.db.cursor()
-    cursor.execute("SELECT * from Users")
-    result = cursor.fetchone()
-    print(result)
-    return 'All Users'
+    cursor.execute("SELECT * from FlashCards")
+    result = cursor.fetchall()
+    cursor.close()
+    return result
+
+
+@app.route("/search/<search_key>")
+@check_key
+def search_decks(search_key):
+    cursor = g.db.cursor()
+    query = "SELECT * FROM FlashCards WHERE deck LIKE %s"
+    value = (search_key + "%",)
+    cursor.execute(query, value)
+    result = cursor.fetchall()
+    cursor.close()
+    return result
+
+
+@app.route("/userdecks")
+@check_key
+def return_user_decks():
+
+    data = request.get_json()
+    cursor = g.db.cursor()
+    query = "SELECT * from FlashCards WHERE username = %s"
+    value = (data['username'],)
+    cursor.execute(query, value)
+    result = cursor.fetchall()
+    cursor.close()
+
+    return result
 
 
 @app.teardown_request
