@@ -96,6 +96,19 @@ def return_decks():
     return result
 
 
+@app.route("/getdeck")
+@check_key
+def return_decks():
+    data = request.get_json()
+    cursor = g.db.cursor()
+    query = "SELECT * FROM FlashCards WHERE username = %s AND deck = %s"
+    value = (data['username', data['deck']])
+    cursor.execute(query, value)
+    result = cursor.fetchall()
+    cursor.close()
+    return result
+
+
 @app.route("/search/<search_key>")
 @check_key
 def search_decks(search_key):

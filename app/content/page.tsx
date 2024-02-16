@@ -16,9 +16,7 @@ export default function MainPage() {
         />
         <button className="text-2xl">🔍</button>
       </form>
-      <div className=" w-full">
-        <Deck />
-      </div>
+      <div className=" w-full"></div>
     </div>
   );
 }
