@@ -2,6 +2,7 @@
 import { redirect } from "next/navigation";
 import signUserUp from "../firebase/firebaseActions";
 import { signUserIn } from "../firebase/firebaseActions";
+import { FlashCard } from "../create/page";
 export async function signUp(formData: FormData) {
   const frmData = {
     email: formData.get("email"),
@@ -21,14 +22,15 @@ export async function signUp(formData: FormData) {
       error = r.error;
 
       if (result !== null) {
+        console.log(result.user);
         fetch("http://127.0.0.1:5000/newuser", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            username: result.user.displayName,
-            uid: result.user.uid,
+            username: result.user,
+            uid: result.user,
           }),
         }).catch((e: Error) => console.log(e.message));
         redirect("/content");
@@ -37,6 +39,31 @@ export async function signUp(formData: FormData) {
   }
 
   return error;
+}
+
+export async function createDeck(
+  cards: FlashCard[],
+  deckName: string,
+  username: string,
+  email: string
+) {
+  for (const card of cards) {
+    let dataO = {
+      username,
+      deck: deckName,
+      question: card.question,
+      answer: card.answer,
+      email,
+    };
+
+    const data = fetch("http://127.0.0.1:5000/addcard", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(dataO),
+    }).catch((e: Error) => console.log(e.message));
+  }
 }
 
 export async function loginUser(formData: FormData) {

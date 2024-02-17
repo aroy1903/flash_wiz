@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useContext, use } from "react";
 import AddedCard from "./components/flashCard";
 import { useRouter } from "next/navigation";
+import { createDeck } from "../actions/clientActions";
+import { AuthContext } from "../context/AuthContext";
 
 export interface FlashCard {
   question: string;
@@ -14,6 +16,8 @@ export default function CreatePage() {
   const [deckName, setDeckName] = useState("");
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
+
+  const { user } = useContext(AuthContext);
 
   const [createdCards, setCreatedCards] = useState<FlashCard[] | []>([]);
 
@@ -59,7 +63,14 @@ export default function CreatePage() {
             </button>
             <button
               className=" text-right ml-3 w-[50%] hover:bg-white hover:text-black hover:text-center"
-              onClick={() => {}}
+              onClick={() =>
+                createDeck(
+                  createdCards,
+                  deckName,
+                  user?.displayName as string,
+                  user?.email as string
+                )
+              }
             >
               create
             </button>

@@ -1,14 +1,17 @@
 from dotenv import load_dotenv
 import mysql.connector
 import os
-from flask import Flask, g, redirect, jsonify, request
+from flask import Flask, g, jsonify, request
 from mysql.connector import Error
 from functools import wraps
+from flask_cors import CORS, cross_origin
 
 load_dotenv()
 
 
 app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 
 @app.before_request
@@ -34,13 +37,14 @@ def check_key(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
         user_key = request.get_json()
-        request_uid = user_key['uid']
+        request_email = user_key['email']
         cursor = g.db.cursor()
         query = "SELECT * FROM Users WHERE username = %s"
-        value = (user_key['username'],)
+        value = (user_key['email'],)
         cursor.execute(query, value)
         username, uid = cursor.fetchone()
-        if (uid != request_uid):
+        if (username != request_email):
+            cursor.close()
             return "Invalid Key"
         cursor.close()
         result = f(*args, **kwargs)
@@ -55,12 +59,13 @@ def say_hi():
 
 
 @app.route("/newuser", methods=["POST"])
+@cross_origin()
 def create_user():
     if request.is_json:
         data = request.get_json()
         cursor = g.db.cursor()
         query = "INSERT INTO Users (username, uid) VALUES (%s, %s)"
-        values = (data['username'], data['uid'])
+        values = (data['username']['email'], data['username']['uid'])
         cursor.execute(query, values)
         g.db.commit()
         cursor.close()
@@ -69,9 +74,11 @@ def create_user():
         return jsonify({"error": "Request must be JSON"}), 400
 
 
-@app.route("/addcard", methods=["POST"])
+@app.route("/addcard", methods=["POST", "OPTIONS"])
+@cross_origin()
 @check_key
 def add_card():
+    print("Adding card")
     if request.is_json:
         data = request.get_json()
         cursor = g.db.cursor()
@@ -98,7 +105,7 @@ def return_decks():
 
 @app.route("/getdeck")
 @check_key
-def return_decks():
+def return_single_deck():
     data = request.get_json()
     cursor = g.db.cursor()
     query = "SELECT * FROM FlashCards WHERE username = %s AND deck = %s"
