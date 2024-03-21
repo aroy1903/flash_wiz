@@ -47,7 +47,7 @@ export default function Header() {
             </h3>
             <h3
               onClick={() => {
-                router.push("/content");
+                router.push("/search");
               }}
               className=" hover:cursor-pointer hover:underline"
             >

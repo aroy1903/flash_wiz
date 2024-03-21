@@ -1,7 +1,7 @@
 "use client";
 
 import { useContext, useEffect } from "react";
-import FlashCardBox from "../../components/FlashCardBox";
+import FlashCardBox from "../components/FlashCardBox";
 import { useParams } from "next/navigation";
 export type QndA = {
   question: string;
@@ -9,8 +9,8 @@ export type QndA = {
 };
 
 export default function LearnBox() {
-  const params = useParams<{ username: string; deck: string }>();
-
+  const { deck } = useParams<{ deck: string }>();
+  console.log(deck);
   const questions: QndA[] = [
     { question: "Who became hokage after Tsunade0", answer: "Naruto" },
     { question: "Who became hokage after Tsunade1", answer: "Naruto" },

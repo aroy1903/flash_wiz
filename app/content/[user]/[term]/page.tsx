@@ -1,5 +1,5 @@
-import { searchDecks } from "../actions/serverActions";
-import Deck from "../components/Deck";
+import { searchDecks } from "@/app/actions/serverActions";
+import Deck from "@/app/components/Deck";
 
 export default function MainPage() {
   return (

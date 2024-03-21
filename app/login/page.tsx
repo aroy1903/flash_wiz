@@ -10,7 +10,7 @@ export default function LoginForm() {
   const [buttonDisable, setButtonDisable] = useState(false);
   useEffect(() => {
     if (user) {
-      router.push("/content");
+      router.push("/search");
     }
   }, [user]);
 

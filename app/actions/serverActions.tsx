@@ -3,22 +3,18 @@
 import { redirect } from "next/navigation";
 
 export default async function clickOnDeck(frmData: FormData) {
-  let key = frmData.get("deckName");
-  let arr: string[] = [];
-  let userName = "";
-  let deckName = "";
+  let deckName = frmData.get("deckName");
 
-  if (typeof key == "string") {
-    arr = key.split(",");
-  }
-  userName = arr[0];
-  deckName = arr[1];
-
-  redirect(`/learn/${userName}/${deckName}`);
+  redirect(`/learn/${deckName}`);
 }
 
 export async function searchDecks(frmData: FormData) {
   let key = frmData.get("searchKey");
-  console.log(key);
-  frmData.set("searchKey", "");
+  let uid = frmData.get("uid");
+
+  if (!key) {
+    return;
+  }
+
+  redirect(`/search/${key}?uid=${uid}`);
 }

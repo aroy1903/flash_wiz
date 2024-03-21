@@ -1,23 +1,10 @@
-
-let card = {question: "ehfwfsljadf", answer: "fsifhsakjfhdsk"}
-
-
-let dataO = {
-  username: "jimmy",
-  deck: "naruto",
-  question: card.question,
-  answer: card.answer,
-}
+const ue = { email:'jax@gmail.com', uid:'pF5I4Eay3DOuyrYBhk5uB5GxuyT2' }
 
 
-
-
-
-
-const data = fetch("http://127.0.0.1:5000/addcard", {
-    method: "POST", 
+const res =  fetch("http://127.0.0.1:5000/alldecks", {
+    method: "POST",
     headers: {
-        'Content-Type': 'application/json', // Specify the content type
-      },
-    body: JSON.stringify(dataO)
-}) 
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(ue),
+  }).then((val)=>val.json()).then((data)=>console.log(data))

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import signUserUp from "../firebase/firebaseActions";
 import { signUserIn } from "../firebase/firebaseActions";
 import { FlashCard } from "../create/page";
+
 export async function signUp(formData: FormData) {
   const frmData = {
     email: formData.get("email"),
@@ -22,7 +23,6 @@ export async function signUp(formData: FormData) {
       error = r.error;
 
       if (result !== null) {
-        console.log(result.user);
         fetch("http://127.0.0.1:5000/newuser", {
           method: "POST",
           headers: {
@@ -33,7 +33,8 @@ export async function signUp(formData: FormData) {
             uid: result.user,
           }),
         }).catch((e: Error) => console.log(e.message));
-        redirect("/content");
+
+        redirect("/search");
       }
     });
   }
@@ -44,12 +45,23 @@ export async function signUp(formData: FormData) {
 export async function createDeck(
   cards: FlashCard[],
   deckName: string,
-  username: string,
-  email: string
+  uid: string,
+  email: string,
+  image: File
 ) {
+  const profile_pic = uploadFlashcardProfile(image, deckName);
+
+  const data = fetch("http://127.0.0.1:5000/adddeck", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ uid, email, deckName }),
+  }).catch((e: Error) => console.log(e.message));
+
   for (const card of cards) {
     let dataO = {
-      username,
+      uid,
       deck: deckName,
       question: card.question,
       answer: card.answer,
@@ -66,6 +78,19 @@ export async function createDeck(
   }
 }
 
+export async function uploadFlashcardProfile(file: File, deckName: string) {
+  const formInput = new FormData();
+  formInput.append("File", file);
+  formInput.append("deckname", JSON.stringify(deckName));
+  const data = await fetch("http://127.0.0.1:5000/upload_profile", {
+    method: "POST",
+    body: formInput,
+  });
+  const img = await data.json();
+  console.log(img);
+  return img.link;
+}
+
 export async function loginUser(formData: FormData) {
   const frmData = {
     email: formData.get("email"),
@@ -79,10 +104,21 @@ export async function loginUser(formData: FormData) {
       result = r.result;
       error = r.error;
       if (result !== null) {
-        redirect("/content");
+        redirect("/search");
       }
     }
   );
 
   return error;
+}
+
+export async function searchDecksClient(frmData: FormData) {
+  let key = frmData.get("searchKey");
+  let uid = frmData.get("uid");
+
+  if (!key) {
+    return;
+  }
+
+  redirect(`/search/${key}?uid=${uid}`);
 }

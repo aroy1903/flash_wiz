@@ -1,13 +1,33 @@
+from multiprocessing import pool
 from dotenv import load_dotenv
 import mysql.connector
 import os
 from flask import Flask, g, jsonify, request
-from mysql.connector import Error
+from mysql.connector import Error, pooling
 from functools import wraps
 from flask_cors import CORS, cross_origin
+from upload import upload_file
+import json
 
 load_dotenv()
 
+
+dbconfig = {
+    "host": os.getenv("HOST"),
+    "user": os.getenv("DB_USERNAME"),
+    "password": os.getenv("DB_PASSWORD"),
+    "port": os.getenv("PORT"),
+    "database": os.getenv("DB")
+}
+
+try:
+    db_pool = pooling.MySQLConnectionPool(
+        pool_name="pool",
+        pool_size=5,
+        **dbconfig
+    )
+except Error as e:
+    print("error connecting to db")
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -17,18 +37,10 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 @app.before_request
 def get_db():
     try:
-        g.db = mysql.connector.connect(
-            host=os.getenv("HOST"),
-            user=os.getenv("DB_USERNAME"),
-            password=os.getenv("DB_PASSWORD"),
-            port=os.getenv("PORT"),
-            database=os.getenv("DB")
-        )
-        if g.db.is_connected():
-            print("Connected to db")
-
+        if 'db' not in g:
+            g.db = db_pool.get_connection()
+            print("Connected to DB")
     except Error as e:
-
         print('error connecting to db')
         return jsonify({"error": "database connection failed"}), 500
 
@@ -37,13 +49,16 @@ def check_key(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
         user_key = request.get_json()
-        request_email = user_key['email']
+        request_uid = user_key['uid']
         cursor = g.db.cursor()
-        query = "SELECT * FROM Users WHERE username = %s"
-        value = (user_key['email'],)
+        query = "SELECT * FROM Users WHERE uid = %s"
+        value = (user_key['uid'],)
         cursor.execute(query, value)
-        username, uid = cursor.fetchone()
-        if (username != request_email):
+        username, uid = None, None
+        ob = cursor.fetchone()
+        if (ob):
+            username, uid = ob
+        if (uid != request_uid):
             cursor.close()
             return "Invalid Key"
         cursor.close()
@@ -56,6 +71,33 @@ def check_key(f):
 @check_key
 def say_hi():
     return "Hello"
+
+
+@app.route("/meow")
+def meor():
+    return "Meow"
+
+
+@app.route("/upload_profile", methods=["POST", "OPTIONS"])
+@cross_origin()
+def upload_pfp():
+
+    if 'File' not in request.files:
+        print("No files")
+        return jsonify({"error": "No files"}), 400
+    data = request.form.get("deckname", None)
+
+    deck = data
+    pfp = request.files['File']
+    print(pfp.filename)
+    if pfp != '':
+        print(pfp.headers)
+
+    ret_val = upload_file(pfp, deck)
+    if (not ret_val):
+        return jsonify({"error": "error uploading files"}), 400
+    else:
+        return jsonify({"link": ret_val})
 
 
 @app.route("/newuser", methods=["POST"])
@@ -83,7 +125,7 @@ def add_card():
         data = request.get_json()
         cursor = g.db.cursor()
         query = "INSERT INTO FlashCards (username, question, answer, deck) VALUES (%s, %s, %s, %s)"
-        values = (data['username'], data['question'],
+        values = (data['uid'], data['question'],
                   data['answer'], data['deck'])
         cursor.execute(query, values)
         g.db.commit()
@@ -93,17 +135,38 @@ def add_card():
         return jsonify({"error": "Request must be JSON"}), 400
 
 
-@app.route("/alldecks")
+@app.route("/adddeck", methods=["POST", "OPTIONS"])
+@cross_origin()
+@check_key
+def add_deck():
+    print("Adding Deck")
+    if request.is_json:
+        data = request.get_json()
+        cursor = g.db.cursor()
+        query = "INSERT INTO Decks (deck, profile_picture, email) VALUES (%s, %s, %s)"
+        values = (data['deckName'], data['profilePicture'],
+                  data['email'])
+        cursor.execute(query, values)
+        g.db.commit()
+        cursor.close()
+        return jsonify({"deck": "added"}), 200
+    else:
+        return jsonify({"error": "Request must be JSON"}), 400
+
+
+@app.route("/alldecks", methods=["GET", "POST"])
+@cross_origin()
 @check_key
 def return_decks():
     cursor = g.db.cursor()
-    cursor.execute("SELECT * from FlashCards")
+    cursor.execute("SELECT * from Users")
     result = cursor.fetchall()
     cursor.close()
     return result
 
 
 @app.route("/getdeck")
+@cross_origin()
 @check_key
 def return_single_deck():
     data = request.get_json()
@@ -116,9 +179,11 @@ def return_single_deck():
     return result
 
 
-@app.route("/search/<search_key>")
+@app.route("/search/<search_key>", methods=["GET", "POST"])
+@cross_origin()
 @check_key
 def search_decks(search_key):
+    print(search_key)
     cursor = g.db.cursor()
     query = "SELECT * FROM FlashCards WHERE deck LIKE %s"
     value = (search_key + "%",)
@@ -129,6 +194,7 @@ def search_decks(search_key):
 
 
 @app.route("/userdecks")
+@cross_origin()
 @check_key
 def return_user_decks():
 
@@ -145,9 +211,8 @@ def return_user_decks():
 
 @app.teardown_request
 def teardown_request_function(error=None):
-    db = getattr(g, "db", None)
-    if db is not None:
-        db.close()
+    if 'db' in g:
+        g.db.close()
 
 
 if __name__ == '__main__':

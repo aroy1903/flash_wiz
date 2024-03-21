@@ -3,7 +3,7 @@
 import { useState, useContext, use } from "react";
 import AddedCard from "./components/flashCard";
 import { useRouter } from "next/navigation";
-import { createDeck } from "../actions/clientActions";
+import { createDeck, uploadFlashcardProfile } from "../actions/clientActions";
 import { AuthContext } from "../context/AuthContext";
 
 export interface FlashCard {
@@ -15,6 +15,8 @@ export default function CreatePage() {
   const [notCreating, setCreating] = useState(false);
   const [deckName, setDeckName] = useState("");
   const [question, setQuestion] = useState("");
+  const [image, setImage] = useState<File | null>(null);
+  const [link, setLink] = useState("");
   const [answer, setAnswer] = useState("");
 
   const { user } = useContext(AuthContext);
@@ -28,6 +30,24 @@ export default function CreatePage() {
           <label className="self-center px-4 mb-2 mt-1 text-2xl underline">
             Deck Name
           </label>
+          <div className="flex flex-row justify-center items-center w-full mt-5">
+            <button
+              className=" mb-2 w-[50%] text-center"
+              onClick={() => {
+                console.log(image);
+              }}
+            >
+              add image:
+            </button>
+            <div className=" flex justify-center">
+              {image ? image.name : ""}
+              <input
+                type="file"
+                className="mb-2 text-black flex w-[50%]"
+                onChange={(e) => setImage(e.target.files![0])}
+              />
+            </div>
+          </div>
           <div className="flex flex-col justify-center items-center flex-grow w-full">
             <input
               type="text"
@@ -67,8 +87,9 @@ export default function CreatePage() {
                 createDeck(
                   createdCards,
                   deckName,
-                  user?.displayName as string,
-                  user?.email as string
+                  user?.uid as string,
+                  user?.email as string,
+                  image as File
                 )
               }
             >

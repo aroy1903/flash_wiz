@@ -25,7 +25,7 @@ export default async function Deck({
           name="deckName"
           hidden={true}
           readOnly
-          value={[deckName, username]}
+          value={deckName}
         />
         <button className=" w-full">Naruto Trivia</button>
       </form>

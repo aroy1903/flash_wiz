@@ -1,5 +1,5 @@
 "use client";
-import { QndA } from "../page";
+import { QndA } from "../[deck]/page";
 import { useState } from "react";
 function FlashCardBox({ cards }: { cards: QndA[] }) {
   const [start, setStart] = useState(0);
