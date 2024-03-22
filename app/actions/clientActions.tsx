@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import signUserUp from "../firebase/firebaseActions";
 import { signUserIn } from "../firebase/firebaseActions";
 import { FlashCard } from "../create/page";
+import { useRouter } from "next/navigation";
 
 export async function signUp(formData: FormData) {
   const frmData = {
@@ -49,14 +50,20 @@ export async function createDeck(
   email: string,
   image: File
 ) {
-  const profile_pic = uploadFlashcardProfile(image, deckName);
+  let link = "";
+  const profile_pic = await uploadFlashcardProfile(image, deckName, uid).then(
+    (val) => {
+      console.log(link);
+      link = val;
+    }
+  );
 
   const data = fetch("http://127.0.0.1:5000/adddeck", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ uid, email, deckName }),
+    body: JSON.stringify({ uid, email, deckName, link }),
   }).catch((e: Error) => console.log(e.message));
 
   for (const card of cards) {
@@ -76,18 +83,24 @@ export async function createDeck(
       body: JSON.stringify(dataO),
     }).catch((e: Error) => console.log(e.message));
   }
+
+  redirect("/learn/" + deckName);
 }
 
-export async function uploadFlashcardProfile(file: File, deckName: string) {
+export async function uploadFlashcardProfile(
+  file: File,
+  deckName: string,
+  uid: string
+) {
   const formInput = new FormData();
   formInput.append("File", file);
-  formInput.append("deckname", JSON.stringify(deckName));
+  formInput.append("deckname", JSON.stringify({ deckName, uid }));
   const data = await fetch("http://127.0.0.1:5000/upload_profile", {
     method: "POST",
     body: formInput,
   });
   const img = await data.json();
-  console.log(img);
+
   return img.link;
 }
 

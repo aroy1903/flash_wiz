@@ -67,27 +67,53 @@ def check_key(f):
     return wrapper
 
 
+def check_key_profile(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        user_key = request.form.to_dict()
+        request_uid_obj = eval(user_key['deckname'])
+        request_uid = request_uid_obj["uid"]
+        cursor = g.db.cursor()
+        query = "SELECT * FROM Users WHERE uid = %s"
+        value = (request_uid,)
+        cursor.execute(query, value)
+        username, uid = None, None
+        ob = cursor.fetchone()
+        if (ob):
+            username, uid = ob
+        if (uid != request_uid):
+            cursor.close()
+            return "Invalid Key"
+        cursor.close()
+        result = f(*args, **kwargs)
+        return result
+    return wrapper
+
+
 @app.route("/test", methods=["POST"])
 @check_key
 def say_hi():
     return "Hello"
 
 
-@app.route("/meow")
+@app.route("/meow", methods=["POST"])
+@cross_origin()
+@check_key_profile
 def meor():
     return "Meow"
 
 
 @app.route("/upload_profile", methods=["POST", "OPTIONS"])
 @cross_origin()
+@check_key_profile
 def upload_pfp():
 
     if 'File' not in request.files:
         print("No files")
         return jsonify({"error": "No files"}), 400
-    data = request.form.get("deckname", None)
-
-    deck = data
+    user_dict = request.form.to_dict()
+    request_obj = eval(user_dict['deckname'])
+    deck = request_obj['deckName']
     pfp = request.files['File']
     print(pfp.filename)
     if pfp != '':
@@ -120,7 +146,6 @@ def create_user():
 @cross_origin()
 @check_key
 def add_card():
-    print("Adding card")
     if request.is_json:
         data = request.get_json()
         cursor = g.db.cursor()
@@ -139,12 +164,11 @@ def add_card():
 @cross_origin()
 @check_key
 def add_deck():
-    print("Adding Deck")
     if request.is_json:
         data = request.get_json()
         cursor = g.db.cursor()
         query = "INSERT INTO Decks (deck, profile_picture, email) VALUES (%s, %s, %s)"
-        values = (data['deckName'], data['profilePicture'],
+        values = (data['deckName'], data['link'],
                   data['email'])
         cursor.execute(query, values)
         g.db.commit()
@@ -159,7 +183,7 @@ def add_deck():
 @check_key
 def return_decks():
     cursor = g.db.cursor()
-    cursor.execute("SELECT * from Users")
+    cursor.execute("SELECT * from Decks")
     result = cursor.fetchall()
     cursor.close()
     return result
@@ -200,8 +224,8 @@ def return_user_decks():
 
     data = request.get_json()
     cursor = g.db.cursor()
-    query = "SELECT * from FlashCards WHERE username = %s"
-    value = (data['username'],)
+    query = "SELECT * from Decks WHERE email = %s"
+    value = (data['email'],)
     cursor.execute(query, value)
     result = cursor.fetchall()
     cursor.close()

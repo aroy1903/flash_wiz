@@ -2,7 +2,7 @@
 
 import { useState, useContext, use } from "react";
 import AddedCard from "./components/flashCard";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { createDeck, uploadFlashcardProfile } from "../actions/clientActions";
 import { AuthContext } from "../context/AuthContext";
 
@@ -18,6 +18,7 @@ export default function CreatePage() {
   const [image, setImage] = useState<File | null>(null);
   const [link, setLink] = useState("");
   const [answer, setAnswer] = useState("");
+  const router = useRouter();
 
   const { user } = useContext(AuthContext);
 
@@ -83,15 +84,16 @@ export default function CreatePage() {
             </button>
             <button
               className=" text-right ml-3 w-[50%] hover:bg-white hover:text-black hover:text-center"
-              onClick={() =>
+              onClick={() => {
                 createDeck(
                   createdCards,
                   deckName,
                   user?.uid as string,
                   user?.email as string,
                   image as File
-                )
-              }
+                );
+                router.push("/learn/" + deckName);
+              }}
             >
               create
             </button>
