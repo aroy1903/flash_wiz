@@ -1,6 +1,5 @@
 from botocore.exceptions import ClientError
 import boto3
-from io import BytesIO
 
 
 def upload_file(file_name, object_name):

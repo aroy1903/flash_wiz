@@ -4,6 +4,7 @@ import { useContext, useEffect, useState } from "react";
 import FlashCardBox from "../components/FlashCardBox";
 import { useParams } from "next/navigation";
 import { AuthContext } from "@/app/context/AuthContext";
+import { ThreeDots } from "react-loader-spinner";
 export type QndA = {
   question: string;
   answer: string;
@@ -11,7 +12,7 @@ export type QndA = {
 
 async function getDeck(uid: string, deck: string) {
   let ue = { uid, deck };
-  const res = await fetch(`http://127.0.0.1:5000/getdeck`, {
+  const res = await fetch(`http://54.219.227.201/getdeck`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -31,7 +32,7 @@ function transformArray(array: string[]) {
 export default function LearnBox() {
   const { deck } = useParams<{ deck: string }>();
   const { user } = useContext(AuthContext);
-  const [data, setData] = useState<[] | QndA[]>();
+  const [data, setData] = useState<null | QndA[]>(null);
   useEffect(() => {
     if (deck !== "" && user) {
       let arr: QndA[] = [];
@@ -45,8 +46,22 @@ export default function LearnBox() {
   }, []);
 
   return (
-    <div className=" h-[88vh] bg-black flex  items-center justify-center">
+    <div className=" min-h-[88vh] bg-black flex  items-center justify-center">
       {data && <FlashCardBox cards={data} />}
+      {!data && (
+        <div className=" w-full h-full flex justify-center items-center">
+          <ThreeDots
+            visible={true}
+            height="100"
+            width="100"
+            color="#FFFFFF"
+            radius="9"
+            ariaLabel="three-dots-loading"
+            wrapperStyle={{}}
+            wrapperClass=""
+          />
+        </div>
+      )}
     </div>
   );
 }

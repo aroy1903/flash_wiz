@@ -10,7 +10,7 @@ function transformArray(array: string[]) {
 
 async function getAllDecks(uid: string, key: string) {
   let ue = { uid };
-  const res = await fetch(`http://127.0.0.1:5000/search/${key}`, {
+  const res = await fetch(`http://54.219.227.201/search/${key}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

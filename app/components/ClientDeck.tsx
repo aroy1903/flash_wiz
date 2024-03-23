@@ -11,7 +11,7 @@ export default function ClientDeck({
   source: string;
 }) {
   return (
-    <div className=" flex flex-col text-[20px] rounded-lg bg-black w-fit  m-5 text-white">
+    <div className=" flex flex-col text-[20px] rounded-lg bg-black w-fit  m-5 text-white h-[40%]">
       <Image
         src={source ? source : defaultImage}
         alt={deckName}

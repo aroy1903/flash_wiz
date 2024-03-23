@@ -3,3 +3,4 @@ mysql-connector-python
 Flask
 flask_cors
 boto3
+botocore

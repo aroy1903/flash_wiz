@@ -24,7 +24,7 @@ export async function signUp(formData: FormData) {
       error = r.error;
 
       if (result !== null) {
-        fetch("http://127.0.0.1:5000/newuser", {
+        fetch("http://54.219.227.201/newuser", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -58,7 +58,7 @@ export async function createDeck(
     }
   );
 
-  const data = fetch("http://127.0.0.1:5000/adddeck", {
+  const data = fetch("http://54.219.227.201/adddeck", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -75,7 +75,7 @@ export async function createDeck(
       email,
     };
 
-    const data = fetch("http://127.0.0.1:5000/addcard", {
+    const data = fetch("http://54.219.227.201/addcard", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -95,7 +95,7 @@ export async function uploadFlashcardProfile(
   const formInput = new FormData();
   formInput.append("File", file);
   formInput.append("deckname", JSON.stringify({ deckName, uid }));
-  const data = await fetch("http://127.0.0.1:5000/upload_profile", {
+  const data = await fetch("http://54.219.227.201/upload_profile", {
     method: "POST",
     body: formInput,
   });

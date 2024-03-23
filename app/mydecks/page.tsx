@@ -5,6 +5,7 @@ import Image from "next/image";
 import { AuthContext } from "../context/AuthContext";
 import { useContext, useEffect, useState } from "react";
 import ClientDeck from "../components/ClientDeck";
+import { ThreeDots } from "react-loader-spinner";
 
 export type UserDeck = {
   deck: string;
@@ -21,7 +22,7 @@ export function transformArray(array: string[]) {
 async function getMyDeck(uid: string, email: string) {
   const ue = { uid, email };
   if (uid !== "") {
-    const res = await fetch("http://127.0.0.1:5000/userdecks", {
+    const res = await fetch("http://54.219.227.201/userdecks", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -36,7 +37,7 @@ async function getMyDeck(uid: string, email: string) {
 
 export default function MyDecks() {
   const { user } = useContext(AuthContext);
-  const [data, setData] = useState<[] | UserDeck[]>([]);
+  const [data, setData] = useState<null | UserDeck[]>(null);
 
   useEffect(() => {
     if (user?.uid) {
@@ -52,9 +53,9 @@ export default function MyDecks() {
   }, []);
 
   return (
-    <div className="w-full h-[88vh]">
-      <div className="w-full flex flex-wrap">
-        {data ? (
+    <div className="w-full min-h-[88vh] flex">
+      <div className="w-full flex flex-wrap grow">
+        {data &&
           data.map((arr) => (
             <ClientDeck
               deckName={arr.deck}
@@ -62,11 +63,20 @@ export default function MyDecks() {
               username={arr.user}
               key={arr.deck}
             />
-          ))
-        ) : (
-          <h1 className=" w-full text-center text-black text-[50px]">
-            Loading...
-          </h1>
+          ))}
+        {!data && (
+          <div className=" w-full h-full flex justify-center items-center">
+            <ThreeDots
+              visible={true}
+              height="100"
+              width="100"
+              color="#111111"
+              radius="9"
+              ariaLabel="three-dots-loading"
+              wrapperStyle={{}}
+              wrapperClass=""
+            />
+          </div>
         )}
       </div>
     </div>
