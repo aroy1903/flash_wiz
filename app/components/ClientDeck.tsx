@@ -1,12 +1,10 @@
-"use server";
 import Image from "next/image";
-import defaultImg from "./default_image.jpg";
-import clickOnDeck from "../actions/serverActions";
-
-export default async function Deck({
+import clickOnDeck from "../actions/clientActions";
+import defaultImage from "./default_image.jpg";
+export default function ClientDeck({
   deckName,
-  username,
   source,
+  username,
 }: {
   deckName: string;
   username: string;
@@ -15,8 +13,8 @@ export default async function Deck({
   return (
     <div className=" flex flex-col text-[20px] rounded-lg bg-black w-fit  m-5 text-white">
       <Image
-        src={source ? source : defaultImg}
-        alt="Naruto"
+        src={source ? source : defaultImage}
+        alt={deckName}
         className=" w-[300px] h[300px] rounded-lg"
         width={300}
         height={300}

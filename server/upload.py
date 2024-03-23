@@ -7,7 +7,7 @@ def upload_file(file_name, object_name):
 
     s3 = boto3.client("s3")
     bucket_name = "flashwiz-deckprofiles"
-    ob_name = object_name
+    ob_name = object_name.replace(" ", "")
     try:
         response = s3.upload_fileobj(file_name, bucket_name, ob_name, ExtraArgs={
             'ContentType': "image/jpeg"

@@ -1,13 +1,10 @@
-from multiprocessing import pool
 from dotenv import load_dotenv
-import mysql.connector
 import os
 from flask import Flask, g, jsonify, request
 from mysql.connector import Error, pooling
 from functools import wraps
 from flask_cors import CORS, cross_origin
 from upload import upload_file
-import json
 
 load_dotenv()
 
@@ -90,19 +87,6 @@ def check_key_profile(f):
     return wrapper
 
 
-@app.route("/test", methods=["POST"])
-@check_key
-def say_hi():
-    return "Hello"
-
-
-@app.route("/meow", methods=["POST"])
-@cross_origin()
-@check_key_profile
-def meor():
-    return "Meow"
-
-
 @app.route("/upload_profile", methods=["POST", "OPTIONS"])
 @cross_origin()
 @check_key_profile
@@ -111,10 +95,12 @@ def upload_pfp():
     if 'File' not in request.files:
         print("No files")
         return jsonify({"error": "No files"}), 400
+
     user_dict = request.form.to_dict()
     request_obj = eval(user_dict['deckname'])
     deck = request_obj['deckName']
     pfp = request.files['File']
+
     print(pfp.filename)
     if pfp != '':
         print(pfp.headers)
@@ -189,14 +175,14 @@ def return_decks():
     return result
 
 
-@app.route("/getdeck")
+@app.route("/getdeck", methods=["GET", "POST"])
 @cross_origin()
 @check_key
 def return_single_deck():
     data = request.get_json()
     cursor = g.db.cursor()
-    query = "SELECT * FROM FlashCards WHERE username = %s AND deck = %s"
-    value = (data['username', data['deck']])
+    query = "SELECT * FROM FlashCards WHERE deck = %s"
+    value = (data['deck'],)
     cursor.execute(query, value)
     result = cursor.fetchall()
     cursor.close()
@@ -209,7 +195,7 @@ def return_single_deck():
 def search_decks(search_key):
     print(search_key)
     cursor = g.db.cursor()
-    query = "SELECT * FROM FlashCards WHERE deck LIKE %s"
+    query = "SELECT * FROM Decks WHERE deck LIKE %s"
     value = (search_key + "%",)
     cursor.execute(query, value)
     result = cursor.fetchall()
@@ -217,7 +203,7 @@ def search_decks(search_key):
     return result
 
 
-@app.route("/userdecks")
+@app.route("/userdecks", methods=["GET", "POST"])
 @cross_origin()
 @check_key
 def return_user_decks():
@@ -229,8 +215,8 @@ def return_user_decks():
     cursor.execute(query, value)
     result = cursor.fetchall()
     cursor.close()
-
-    return result
+    print(result)
+    return jsonify({"result": result}), 200
 
 
 @app.teardown_request

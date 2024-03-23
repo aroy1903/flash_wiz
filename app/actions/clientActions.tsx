@@ -135,3 +135,9 @@ export async function searchDecksClient(frmData: FormData) {
 
   redirect(`/search/${key}?uid=${uid}`);
 }
+
+export default async function clickOnDeck(frmData: FormData) {
+  let deckName = frmData.get("deckName");
+
+  redirect(`/learn/${deckName}`);
+}

@@ -1,5 +1,12 @@
 import { searchDecks } from "@/app/actions/serverActions";
 import Deck from "@/app/components/Deck";
+import { UserDeck } from "@/app/mydecks/page";
+
+function transformArray(array: string[]) {
+  let ud: UserDeck = { deck: array[0], profileLink: array[1], user: array[2] };
+
+  return ud;
+}
 
 async function getAllDecks(uid: string, key: string) {
   let ue = { uid };
@@ -7,8 +14,6 @@ async function getAllDecks(uid: string, key: string) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Cache-Control": "no-cache, no-store, must-revalidate",
-      Pragma: "no-cache",
     },
     body: JSON.stringify(ue),
   });
@@ -26,6 +31,13 @@ export default async function MainPage({
   const { uid } = searchParams;
   const { term } = params;
 
+  const data = await getAllDecks(uid as string, term);
+  const sd: UserDeck[] = [];
+
+  for (const deck of data) {
+    sd.push(transformArray(deck));
+  }
+
   return (
     <div className=" min-h-[88vh] flex flex-col">
       <form
@@ -41,7 +53,16 @@ export default async function MainPage({
         <input type="hidden" name="uid" value={uid} />
         <button className="text-2xl">🔍</button>
       </form>
-      <div className=" w-full"></div>
+      <div className=" w-full  flex flex-wrap">
+        {sd.map((d) => (
+          <Deck
+            deckName={d.deck}
+            username={d.user}
+            source={d.profileLink}
+            key={d.deck}
+          />
+        ))}
+      </div>
     </div>
   );
 }

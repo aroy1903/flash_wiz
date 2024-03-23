@@ -46,6 +46,7 @@ export default function CreatePage() {
                 type="file"
                 className="mb-2 text-black flex w-[50%]"
                 onChange={(e) => setImage(e.target.files![0])}
+                accept="image/jpeg"
               />
             </div>
           </div>

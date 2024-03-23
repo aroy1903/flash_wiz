@@ -4,6 +4,9 @@ import Deck from "@/app/components/Deck";
 import { searchDecksClient } from "../actions/clientActions";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
+import { transformArray, UserDeck } from "../mydecks/page";
+import ClientDeck from "../components/ClientDeck";
+
 async function getAllDecks(uid: string) {
   let ue = { uid };
   const res = await fetch("http://127.0.0.1:5000/alldecks", {
@@ -20,15 +23,20 @@ async function getAllDecks(uid: string) {
 
 export default function MainPage() {
   const { user } = useContext(AuthContext);
-  const [data, setData] = useState([]);
-  // useEffect(() => {
-  //   if (user) {
-  //     getAllDecks(user.uid).then((val) => {
-  //       setData(val);
-  //       console.log(val);
-  //     });
-  //   }
-  // }, []);
+  const [data, setData] = useState<[] | UserDeck[]>([]);
+  useEffect(() => {
+    if (user?.uid) {
+      getAllDecks(user?.uid as string).then((val) => {
+        let ud: UserDeck[] = [];
+        let results = val;
+        for (const arr of results) {
+          ud.push(transformArray(arr));
+        }
+        setData(ud);
+        console.log(val);
+      });
+    }
+  }, []);
 
   return (
     <div className=" min-h-[88vh] flex flex-col">
@@ -45,7 +53,17 @@ export default function MainPage() {
         <input type="hidden" name="uid" value={user?.uid} />
         <button className="text-2xl">🔍</button>
       </form>
-      <div className=" w-full"></div>
+      <div className=" w-full flex flex-wrap">
+        {data &&
+          data.map((arr) => (
+            <ClientDeck
+              deckName={arr.deck}
+              source={arr.profileLink}
+              username={arr.user}
+              key={arr.deck}
+            />
+          ))}
+      </div>
     </div>
   );
 }
